@@ -6,7 +6,8 @@ KubeJS × [PneumaticCraft: Repressurized](https://github.com/TeamPneumatic/pnc-r
 **10 个气动专用配方组件 + 1 个 schema 函数类型 + 11 类配方 schema**，同一个 jar。
 
 - 仓库：<https://github.com/IronHammer-Std/KubeJS-PneumaticCraft>
-- 适用：Minecraft 1.21.1 · NeoForge 21.1.181+ · KubeJS 2101.7.2-build.303+ · PneumaticCraft 8.2+
+- 下载：<https://github.com/IronHammer-Std/KubeJS-PneumaticCraft/releases>（不想自己编译就用这里的 jar）
+- 适用：Minecraft 1.21.1 · NeoForge 21.1.181+ · KubeJS 2101.7.2-build.303+ · PneumaticCraft 8.2+ · Java 21
 - 发布页文案见 [`DESCRIPTION.md`](DESCRIPTION.md)
 
 > 全网核查过（Modrinth / CurseForge / KubeJS 官方第三方列表）：在写这份东西之前
@@ -130,6 +131,9 @@ pwsh -File tools\smoke.ps1                                  # 离线 codec 冒�
 - `-Instance` 也可用环境变量 `TAAO_INSTANCE` 提供；只需编译时**不必**给。
 
 ### 从零构建（clone 之后怎么补齐 `libs\`）
+
+> 只是想把 jar 装进整合包？直接从 [Releases](https://github.com/IronHammer-Std/KubeJS-PneumaticCraft/releases)
+> 下载即可，以下内容只有想自己编译时才需要。
 
 `libs\` 与 `libs-run\` 里是第三方 jar，**不进仓库**（不再分发）。自己 clone 后需要准备：
 
