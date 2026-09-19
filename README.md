@@ -7,11 +7,9 @@ KubeJS × [PneumaticCraft: Repressurized](https://github.com/TeamPneumatic/pnc-r
 
 - 仓库：<https://github.com/IronHammer-Std/KubeJS-PneumaticCraft>
 - 下载：<https://github.com/IronHammer-Std/KubeJS-PneumaticCraft/releases>（不想自己编译就用这里的 jar）
+- CurseForge：<https://www.curseforge.com/minecraft/mc-mods/kubejs-pneumaticcraft>
 - 适用：Minecraft 1.21.1 · NeoForge 21.1.181+ · KubeJS 2101.7.2-build.303+ · PneumaticCraft 8.2+ · Java 21
 - 发布页文案见 [`DESCRIPTION.md`](DESCRIPTION.md)
-
-> 全网核查过（Modrinth / CurseForge / KubeJS 官方第三方列表）：在写这份东西之前
-> **不存在** KubeJS × PnC 的联动件 —— PnC 本体只带 CraftTweaker 支持，jar 里 0 处 kubejs。
 
 ---
 
