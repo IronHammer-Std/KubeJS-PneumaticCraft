@@ -1,0 +1,21 @@
+{
+	"keys": [
+		{
+			"name": "fluid",
+			"role": "input",
+			"type": "pneumaticcraft:fluid_ingredient_unsized"
+		},
+		{
+			"name": "air_per_bucket",
+			"role": "other",
+			"type": "positive_int"
+		},
+		{
+			"name": "burn_rate",
+			"role": "other",
+			"type": "positive_float",
+			"default_optional": true
+		}
+	],
+	"unique": ["fluid"]
+}

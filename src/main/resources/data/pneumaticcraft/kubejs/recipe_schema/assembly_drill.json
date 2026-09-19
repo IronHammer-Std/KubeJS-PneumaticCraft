@@ -1,0 +1,20 @@
+{
+	"keys": [
+		{
+			"name": "result",
+			"role": "output",
+			"type": "item_stack"
+		},
+		{
+			"name": "input",
+			"role": "input",
+			"type": "flat_sized_ingredient"
+		},
+		{
+			"name": "program",
+			"role": "other",
+			"type": "pneumaticcraft:assembly_program"
+		}
+	],
+	"unique": ["result"]
+}

@@ -1,0 +1,16 @@
+# 仓库内一律 LF 存储与检出（Windows 上也一样；PowerShell / javac 都能读 LF）
+* text=auto eol=lf
+
+*.java text
+*.json text
+*.md text
+*.toml text
+*.txt text
+*.ps1 text
+
+# 二进制
+*.MF text eol=crlf
+
+*.png binary
+*.zip binary
+*.jar binary

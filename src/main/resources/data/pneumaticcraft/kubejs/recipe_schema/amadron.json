@@ -1,0 +1,50 @@
+{
+	"keys": [
+		{
+			"name": "offer_id",
+			"role": "other",
+			"type": "string"
+		},
+		{
+			"name": "input",
+			"role": "input",
+			"type": "pneumaticcraft:amadron_resource"
+		},
+		{
+			"name": "output",
+			"role": "output",
+			"type": "pneumaticcraft:amadron_resource"
+		},
+		{
+			"name": "level",
+			"role": "other",
+			"type": "int",
+			"default_optional": true
+		},
+		{
+			"name": "static",
+			"role": "other",
+			"type": "boolean",
+			"default_optional": true
+		},
+		{
+			"name": "villager_trade",
+			"role": "other",
+			"type": "boolean",
+			"default_optional": true
+		},
+		{
+			"name": "maxStock",
+			"role": "other",
+			"type": "int",
+			"default_optional": true
+		},
+		{
+			"name": "inStock",
+			"role": "other",
+			"type": "int",
+			"default_optional": true
+		}
+	],
+	"unique": ["output"]
+}

@@ -1,0 +1,77 @@
+{
+	"keys": [
+		{
+			"name": "block",
+			"role": "other",
+			"type": "block"
+		},
+		{
+			"name": "temperature",
+			"role": "other",
+			"type": "non_negative_int"
+		},
+		{
+			"name": "thermalResistance",
+			"role": "other",
+			"type": "double",
+			"default_optional": true
+		},
+		{
+			"name": "heatCapacity",
+			"role": "other",
+			"type": "non_negative_int",
+			"default_optional": true
+		},
+		{
+			"name": "transforms",
+			"role": "other",
+			"type": {
+				"type": "custom_object",
+				"keys": [
+					{
+						"name": "hot",
+						"role": "other",
+						"component": "string",
+						"optional": true
+					},
+					{
+						"name": "cold",
+						"role": "other",
+						"component": "string",
+						"optional": true
+					},
+					{
+						"name": "hot_flowing",
+						"role": "other",
+						"component": "string",
+						"optional": true
+					},
+					{
+						"name": "cold_flowing",
+						"role": "other",
+						"component": "string",
+						"optional": true
+					}
+				]
+			},
+			"default_optional": true
+		},
+		{
+			"name": "predicates",
+			"role": "other",
+			"type": {
+				"type": "map",
+				"key": "string",
+				"component": "string"
+			},
+			"default_optional": true
+		},
+		{
+			"name": "description",
+			"role": "other",
+			"type": "string",
+			"default_optional": true
+		}
+	],
+	"unique": ["block"]
+}

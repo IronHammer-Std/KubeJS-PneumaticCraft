@@ -1,0 +1,35 @@
+{
+	"keys": [
+		{
+			"name": "input1",
+			"role": "input",
+			"type": "pneumaticcraft:fluid_ingredient"
+		},
+		{
+			"name": "input2",
+			"role": "input",
+			"type": "pneumaticcraft:fluid_ingredient"
+		},
+		{
+			"name": "fluid_output",
+			"role": "output",
+			"type": "pneumaticcraft:fluid_stack_optional"
+		},
+		{
+			"name": "item_output",
+			"role": "output",
+			"type": "item_stack"
+		},
+		{
+			"name": "pressure",
+			"role": "input",
+			"type": "float"
+		},
+		{
+			"name": "time",
+			"role": "other",
+			"type": "ticks"
+		}
+	],
+	"unique": ["fluid_output", "item_output"]
+}

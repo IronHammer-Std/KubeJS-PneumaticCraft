@@ -1,0 +1,45 @@
+{
+	"keys": [
+		{
+			"name": "input",
+			"role": "input",
+			"type": {
+				"type": "either",
+				"left": {
+					"type": "custom_object",
+					"keys": [
+						{
+							"name": "fluid",
+							"role": "input",
+							"component": "pneumaticcraft:fluid_container_ingredient"
+						}
+					]
+				},
+				"right": "ingredient"
+			}
+		},
+		{
+			"name": "temperature",
+			"role": "input",
+			"type": "non_negative_int"
+		},
+		{
+			"name": "output",
+			"role": "output",
+			"type": "item_stack"
+		},
+		{
+			"name": "bonusMultiplier",
+			"role": "other",
+			"type": "non_negative_float",
+			"default_optional": true
+		},
+		{
+			"name": "bonusLimit",
+			"role": "other",
+			"type": "non_negative_float",
+			"default_optional": true
+		}
+	],
+	"unique": ["output"]
+}

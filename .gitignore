@@ -1,0 +1,22 @@
+# 编译/测试用的第三方 jar —— 不进仓库（不再分发）
+libs/
+libs-run/
+
+# 构建与运行产物
+build/
+dist/
+logs/
+
+# 反编译研究产物（KubeJS / PnC 的源码，版权归原作者，绝不入库）
+.study/
+
+# 保险：任何 jar 都不提交（需要发布产物请走 GitHub Releases）
+*.jar
+
+# 杂项
+*.log
+*.tmp
+*.user
+.vs/
+.idea/
+.vscode/

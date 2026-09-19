@@ -1,0 +1,58 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="kubejs_pneumaticcraft"
+version="2101.1.0"
+displayName="KubeJS PneumaticCraft"
+authors="TAAO"
+logoFile="kubejs_pneumaticcraft_logo.png"
+description='''
+KubeJS integration for PneumaticCraft: Repressurized.
+
+Write 11 PnC recipe types with event.recipes.pneumaticcraft.* instead of hand-written
+event.custom JSON - and get a real error (with the list of legal keys) when a field is
+wrong, instead of PnC silently ignoring it.
+
+Recipe types: pressure_chamber, explosion_crafting, assembly_drill, assembly_laser,
+fluid_mixer, refinery, thermo_plant, amadron, heat_frame_cooling, fuel_quality,
+heat_properties.
+
+Registers 10 PneumaticCraft-specific recipe components plus the pnc_set_field schema
+function (.minTemp(373) / .maxTemp(333)).
+
+Zero invasion: no mixins, no access transformers, no registry changes, no content -
+it only registers recipe field types with KubeJS. Requires KubeJS and PneumaticCraft.
+
+MIT. References no me.desht.pneumaticcraft.* classes: every rule was read out of PnC's
+sources and re-implemented, so it neither inherits GPLv3 nor breaks when PnC internals change.
+'''
+
+[[dependencies.kubejs_pneumaticcraft]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.181,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.kubejs_pneumaticcraft]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.22)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.kubejs_pneumaticcraft]]
+modId="kubejs"
+type="required"
+versionRange="[2101.7.2-build.303,)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.kubejs_pneumaticcraft]]
+modId="pneumaticcraft"
+type="required"
+versionRange="[8.2,)"
+ordering="AFTER"
+side="BOTH"

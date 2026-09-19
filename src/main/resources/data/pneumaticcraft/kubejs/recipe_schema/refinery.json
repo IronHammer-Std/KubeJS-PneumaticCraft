@@ -1,0 +1,40 @@
+{
+	"keys": [
+		{
+			"name": "input",
+			"role": "input",
+			"type": "pneumaticcraft:fluid_ingredient"
+		},
+		{
+			"name": "outputs",
+			"role": "output",
+			"type": {
+				"type": "list",
+				"component": "pneumaticcraft:fluid_stack",
+				"min": 2,
+				"max": 4
+			}
+		},
+		{
+			"name": "temperature",
+			"role": "input",
+			"type": "pneumaticcraft:temperature_range",
+			"optional": {
+				"min": 373
+			}
+		}
+	],
+	"unique": ["outputs"],
+	"functions": {
+		"minTemp": {
+			"type": "pnc_set_field",
+			"key": "temperature",
+			"field": "min"
+		},
+		"maxTemp": {
+			"type": "pnc_set_field",
+			"key": "temperature",
+			"field": "max"
+		}
+	}
+}

@@ -1,0 +1,57 @@
+{
+	"keys": [
+		{
+			"name": "inputs",
+			"role": "input",
+			"type": "pneumaticcraft:thermo_inputs"
+		},
+		{
+			"name": "outputs",
+			"role": "output",
+			"type": "pneumaticcraft:thermo_outputs"
+		},
+		{
+			"name": "temperature",
+			"role": "input",
+			"type": "pneumaticcraft:temperature_range",
+			"default_optional": true
+		},
+		{
+			"name": "pressure",
+			"role": "input",
+			"type": "float",
+			"default_optional": true
+		},
+		{
+			"name": "speed",
+			"role": "other",
+			"type": "float",
+			"default_optional": true
+		},
+		{
+			"name": "air_use_multiplier",
+			"role": "other",
+			"type": "float",
+			"default_optional": true
+		},
+		{
+			"name": "exothermic",
+			"role": "other",
+			"type": "boolean",
+			"default_optional": true
+		}
+	],
+	"unique": ["outputs"],
+	"functions": {
+		"minTemp": {
+			"type": "pnc_set_field",
+			"key": "temperature",
+			"field": "min"
+		},
+		"maxTemp": {
+			"type": "pnc_set_field",
+			"key": "temperature",
+			"field": "max"
+		}
+	}
+}
