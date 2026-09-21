@@ -13,7 +13,7 @@
 			"role": "input",
 			"type": {
 				"type": "list",
-				"component": "flat_sized_ingredient"
+				"component": "pneumaticcraft:item_ingredient"
 			}
 		},
 		{

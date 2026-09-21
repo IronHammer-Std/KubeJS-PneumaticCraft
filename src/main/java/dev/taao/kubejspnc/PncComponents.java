@@ -5,6 +5,7 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentTypeRegistry;
 import dev.taao.kubejspnc.component.AmadronResourceComponent;
 import dev.taao.kubejspnc.component.FluidIngredientComponent;
+import dev.taao.kubejspnc.component.ItemIngredientComponent;
 import dev.taao.kubejspnc.component.PncFluidStackComponent;
 import dev.taao.kubejspnc.component.TemperatureRangeComponent;
 import dev.taao.kubejspnc.component.ThermoInputsComponent;
@@ -15,6 +16,7 @@ import dev.taao.kubejspnc.value.TemperatureRangeValue;
 import dev.taao.kubejspnc.value.ThermoInputsValue;
 import dev.taao.kubejspnc.value.ThermoOutputsValue;
 import java.util.List;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
@@ -30,6 +32,9 @@ public final class PncComponents {
 
 	public static final RecipeComponentType<TemperatureRangeValue> TEMPERATURE_RANGE =
 		RecipeComponentType.unit(PncUtil.id("temperature_range"), TemperatureRangeComponent::new);
+
+	public static final RecipeComponentType<SizedIngredient> ITEM_INGREDIENT =
+		RecipeComponentType.unit(PncUtil.id("item_ingredient"), ItemIngredientComponent::new);
 
 	public static final RecipeComponentType<SizedFluidIngredient> FLUID_INGREDIENT =
 		RecipeComponentType.unit(PncUtil.id("fluid_ingredient"), FluidIngredientComponent::sizedFlat);
@@ -60,6 +65,7 @@ public final class PncComponents {
 
 	public static final List<RecipeComponentType<?>> ALL = List.of(
 		TEMPERATURE_RANGE,
+		ITEM_INGREDIENT,
 		FLUID_INGREDIENT,
 		FLUID_INGREDIENT_UNSIZED,
 		FLUID_CONTAINER_INGREDIENT,

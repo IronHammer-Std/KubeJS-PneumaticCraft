@@ -192,6 +192,26 @@ try {
 	$unused = @($declared | Where-Object { -not $usedMine.Contains($_) })
 	if ($unused.Count -gt 0) { Write-Host ("         已注册但本批 schema 未用: {0}" -f (($unused | Sort-Object) -join ', ')) }
 
+	# 第三层补充：禁用 KubeJS 内置的 sized-ingredient 组件
+	#   实测（2026-09-20）：SizedIngredientWrapper.wrapResult() 收到 JS 对象时走
+	#   IngredientWrapper.wrapResult(...).map(IngredientKJS::kjs$asStack)，而 kjs$asStack()
+	#   把数量硬编码为 1 ⇒ {count:4, tag:...} 在位置参数/键函数路径下被静默压成 1 个
+	#   （对象形态走 codec 不受影响，于是同一包里两种写法消耗量还不一样）。
+	#   本件改用自注册的 pneumaticcraft:item_ingredient；这条检查防止以后写回去。
+	$banned = @('flat_sized_ingredient', 'sized_ingredient', 'optional_flat_sized_ingredient', 'optional_sized_ingredient')
+	$bannedHits = New-Object System.Collections.Generic.List[string]
+	foreach ($e in ($z.Entries | Where-Object { $_.FullName -match 'recipe_schema/.*\.json$' })) {
+		$sr = New-Object System.IO.StreamReader($e.Open()); $txt = $sr.ReadToEnd(); $sr.Close()
+		foreach ($b in $banned) {
+			if ($txt.Contains('"' + $b + '"')) { $bannedHits.Add((Split-Path $e.FullName -Leaf) + ' : ' + $b) }
+		}
+	}
+	if ($bannedHits.Count -gt 0) {
+		$bannedHits | ForEach-Object { Write-Host ("         X " + $_) }
+		throw 'schema 用了 KubeJS 内置的 sized-ingredient 组件（会静默吞掉 count）—— 请改用 pneumaticcraft:item_ingredient'
+	}
+	Write-Host '         未使用 KubeJS 内置 sized-ingredient 组件（count 不会被吞）'
+
 	# 第四层：schema 的键名必须是 PnC 真的字段名、且 PnC 的必填字段都已声明
 	#   （首轮实机踩坑后加的：thermo_plant 把 inputs 写成 input ⇒ KubeJS 写出 "input" ⇒ PnC 报 "No key inputs"）
 	$pncKeys = @{

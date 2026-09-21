@@ -298,3 +298,58 @@ taao-dev\kubejs-pnc\
 **收尾检查**：R11 `VIOLATIONS 0` / cfg id `MISSING=0`（117 jar，探针删除后 script-made-ids 107 → 84、refs 250 → 226）。
 > ⚠️ 探针里 `event.failedCount` **JS 侧读不到**（返回 undefined ⇒ 我的 `failedCount()` 回退成 -1、不显示后缀），
 > 所以"没抛异常 ≠ 建成"这件事最终是靠 KubeJS 自己的汇总行（`with N failed recipes` / `errors found [N]`）判定的 —— 这也是更可靠的判据。
+
+---
+
+### 9.8 第三轮：物品输入的 `count` 被**静默吞掉**（用户报障 → 定位 → 修，2026-09-20）
+
+**现象**：玩家写第一章那条压缩铁锻锤配方，`inputs` 里 `{ count: 4, tag: 'c:ingots/compressed_iron' }` **不生效** ——
+配方能加载、KubeJS **不报任何错**，但压力室里只要 1 个压缩铁。
+
+**根因（读 KubeJS 字节码反编译源码，非猜测）**：KubeJS 的 `SizedIngredientWrapper` 在"JS 对象 → `SizedIngredient`"这条路上
+**根本不读 `count`**：
+
+| 步 | 代码 | 结果 |
+|---|---|---|
+| 1 | `RecipeComponent.wrap()` 默认实现 = `cx.cx().jsToJava(from, typeInfo())` | 按 `SizedIngredientWrapper.TYPE_INFO` 派发 |
+| 2 | `SizedIngredientWrapper.wrapResult()`（`.study\kjs-neoforge\...\SizedIngredientWrapper.java:55-68`） | Map 既不是 trivial 也不是字符串 ⇒ 落到第 66 行 |
+| 3 | 第 66 行 = `IngredientWrapper.wrapResult(cx, from).map(IngredientKJS::kjs$asStack)` | 先把 Map 当 **Ingredient** 解析（`Ingredient.CODEC` 里**没有 count 这个概念**，多余键被忽略） |
+| 4 | `IngredientKJS.kjs$asStack()`（同批反编译 `...\core\IngredientKJS.java:56-58`）= `new SizedIngredient(this.kjs$self(), 1)` | **数量硬编码 1** ⇒ 4 变 1 |
+
+对照：输出侧没这个毛病 —— `ItemStackComponent` 走 `ItemWrapper.wrapResult()`，Map 分支是
+`ItemStack.CODEC.parse(registries.java(), map)`（`ItemWrapper.java:188-193`），`count` 是真的读的；
+**对象形态**同理走 codec，`SizedIngredient.FLAT_CODEC` 也读 `count`。
+
+**三种写法在 2101.1.0 下的真实命运**：
+
+| 写法 | 路径 | `count` |
+|---|---|---|
+| 对象形态 `P.pressure_chamber({inputs:[{count:4,…}],…})` | codec | ✅ 4 |
+| 位置参数 / 键函数 `{count:4, item\|tag}` | 组件 `wrap()` → KubeJS 缺陷 | ❌ **1（静默）** |
+| 位置参数 `'4x #tag'` / `Item.of(id,4)` / `Ingredient.of('#tag',4)` | 组件 `wrap()` 的字符串 / trivial 分支 | ✅ 4 |
+
+**为什么第二轮探针没抓到**：B1（对象形态）与 C1（位置参数）都写了 `count: 4`，但探针只判"**配方建成没有**"，
+没对**数量**下断言 —— 而两条路恰好一条对一条错，于是两条都被记成 ✔。**教训：探针必须对"数值"断言，不能只判"没异常"。**
+
+**修法（2101.2.0）**：
+
+1. 新增自注册组件 **`pneumaticcraft:item_ingredient`**（`ItemIngredientComponent`，codec = `SizedIngredient.FLAT_CODEC`）——
+   自己实现 `wrap()` 把 `count` 读出来，并沿用本件"键写错即报错"的风格（未知键 / `tag`+`item` 互斥 / `count ≥ 1`）。
+   接受的形态：`{count?, item|tag}`、`'4x #tag'`、`Item.of(id,4)`、`Ingredient.of('#tag',4)`。
+2. **4 类物品输入换组件**：`pressure_chamber.inputs` / `explosion_crafting.input` / `assembly_drill.input` / `assembly_laser.input`。
+   顺带把实例里数据包那份 `mekmm:pressing` schema（B1 实验产物，同样 3 个 `flat_sized_ingredient`）一起换掉。
+3. `build.ps1` 加**静态检查**：schema 里出现 KubeJS 内置的 `flat_sized_ingredient` / `sized_ingredient` / 两个 optional 变体 ⇒
+   直接构建失败。这类"编译期看不出来、运行期静默错"的坑，必须在打包阶段拦。
+4. 版本号 **2101.1.0 → 2101.2.0**（新增一个组件 = minor）。
+
+**不受影响**：`thermo_plant.inputs.item` —— PnC 侧 `ThermoPlantRecipe.Inputs.inputItem()` 本来就是
+`Optional<Ingredient>`（**没有数量概念**，已读 `ThermoPlantRecipeImpl.java` 确认），组件用 `Ingredient` 是对的；
+`amadron_resource` / 各类 `item_stack` 产出走 `ItemStack.CODEC`，本来就正常。
+
+**离线证据**：`tools\smoke.ps1` **53/53**（新增 N1–N7：`{tag,count:4}` 解出 4、`count:0` 被拒、
+`{item,tag}` 被 xor 拒、写出形状 `{"tag":"c:ingots/compressed_iron","count":4}`、数量语义 `≥count` 才匹配）。
+**待实机**：探针 `kubejs\dev-probes\pnc-sized-probe.js`（7 条 `taao:tc/sized/*`，A/B/C/D 四组写法），
+判据 = JEI 里每条都显示 **4** 个 / `/kubejs export` 导出 JSON 里 `inputs[0].count == 4`。
+
+**产物**：`dist\kubejs_pneumaticcraft-2101.2.0.jar`，60,375 B / 37 条目（schema 11 + class 21 + 元数据 4 + 图标 1），
+sha256 `d398b5ea947d00ae9e45293c686b01392ea923d7dccf6939e8b7eaf6daf8f94a`。

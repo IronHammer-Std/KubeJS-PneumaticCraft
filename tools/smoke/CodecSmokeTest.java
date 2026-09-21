@@ -17,8 +17,14 @@ import net.minecraft.SharedConstants;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
@@ -148,7 +154,22 @@ public class CodecSmokeTest {
 		check("P1 枚举名", AssemblyProgram.DRILL.getSerializedName().equals("drill") && AssemblyProgram.LASER.getSerializedName().equals("laser"));
 		check("P2 只有两个值（drill_laser 不存在）", AssemblyProgram.values().length == 2);
 
-		// ---------- 8. fluid_stack（产出用；位置参数路径下替掉 KubeJS 内置件） ----------
+		// ---------- 8. item_ingredient（数量！2026-09-20 修的那个坑） ----------
+		log("\n-- pneumaticcraft:item_ingredient（= NeoForge SizedIngredient.FLAT_CODEC） --");
+		decodeOk("N1 {item,count:4}", SizedIngredient.FLAT_CODEC, "{\"item\":\"minecraft:iron_ingot\",\"count\":4}", v -> v.count() == 4);
+		decodeOk("N2 {tag,count:4}（= 压缩铁那条写法）", SizedIngredient.FLAT_CODEC, "{\"tag\":\"c:ingots/compressed_iron\",\"count\":4}", v -> v.count() == 4);
+		decodeOk("N3 {tag}（count 缺省 1）", SizedIngredient.FLAT_CODEC, "{\"tag\":\"c:ingots/compressed_iron\"}", v -> v.count() == 1);
+		decodeFail("N4 {count:0} 应拒（NeoForge 要求 count >= 1）", SizedIngredient.FLAT_CODEC, "{\"item\":\"minecraft:iron_ingot\",\"count\":0}");
+		decodeFail("N5 {item,tag} 同时给应拒（NeoForge 用 xor，两条都读得通就报错）",
+			SizedIngredient.FLAT_CODEC, "{\"item\":\"minecraft:iron_ingot\",\"tag\":\"c:ingots/iron\"}");
+		encode("N6 写出 {tag,count:4}（PnC 要的形状）", SizedIngredient.FLAT_CODEC,
+			new SizedIngredient(Ingredient.of(TagKey.create(Registries.ITEM, ResourceLocation.parse("c:ingots/compressed_iron"))), 4),
+			"{\"tag\":\"c:ingots/compressed_iron\",\"count\":4}");
+		SizedIngredient four = new SizedIngredient(Ingredient.of(Items.IRON_INGOT), 4);
+		check("N7 数量语义：1 个不匹配、4 个才匹配（NeoForge 是 >= count）",
+			!four.test(new ItemStack(Items.IRON_INGOT, 1)) && four.test(new ItemStack(Items.IRON_INGOT, 4)));
+
+		// ---------- 9. fluid_stack（产出用；位置参数路径下替掉 KubeJS 内置件） ----------
 		log("\n-- pneumaticcraft:fluid_stack / :fluid_stack_optional（codec = NeoForge FluidStack.CODEC） --");
 		decodeOk("S1 {id,amount}", FluidStack.CODEC, "{\"id\":\"minecraft:water\",\"amount\":500}", v -> v.getAmount() == 500);
 		decodeFail("S2 {id} 无 amount 应拒（PnC 的 FluidStack codec 里 amount 是必填；组件 wrap 路径才会补 1000）", FluidStack.CODEC, "{\"id\":\"minecraft:lava\"}");

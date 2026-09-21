@@ -8,7 +8,7 @@
 		{
 			"name": "input",
 			"role": "input",
-			"type": "flat_sized_ingredient"
+			"type": "pneumaticcraft:item_ingredient"
 		},
 		{
 			"name": "program",

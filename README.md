@@ -3,7 +3,7 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 KubeJS × [PneumaticCraft: Repressurized](https://github.com/TeamPneumatic/pnc-repressurized) 联动件：
-**10 个气动专用配方组件 + 1 个 schema 函数类型 + 11 类配方 schema**，同一个 jar。
+**11 个气动专用配方组件 + 1 个 schema 函数类型 + 11 类配方 schema**，同一个 jar。
 
 - 仓库：<https://github.com/IronHammer-Std/KubeJS-PneumaticCraft>
 - 下载：<https://github.com/IronHammer-Std/KubeJS-PneumaticCraft/releases>（不想自己编译就用这里的 jar）
@@ -21,7 +21,7 @@ PnC 的 codec 会静默忽略多余/写错的键，或者到解析时才炸。
 
 本件做两件事：
 
-1. **注册 10 个 PnC 专用配方组件 + 1 个 schema 函数类型**（Java 插件）；
+1. **注册 11 个 PnC 专用配方组件 + 1 个 schema 函数类型**（Java 插件）；
 2. **提供 11 类配方的 schema**（数据，`data/pneumaticcraft/kubejs/recipe_schema/*.json`）。
 
 于是可以：
@@ -56,6 +56,7 @@ Valid keys: [id, tag, amount]
 | 组件 id | Java 类型 | JSON 形状 | 用在 | 依据（实读 PnC 源码） |
 |---|---|---|---|---|
 | `pneumaticcraft:temperature_range` | `TemperatureRangeValue` | `{min?}` / `{max?}` / 缺省=any | refinery / thermo_plant 的 `temperature` | `TemperatureRange.CODEC`：min 缺省 0、max 缺省 `MAX_VALUE`、两者 ≥0、**严格 min &lt; max** |
+| `pneumaticcraft:item_ingredient` | `SizedIngredient` | `{count?, item\|tag}`（count 缺省 1，必须 ≥ 1）；也认 `'4x #tag'` / `Item.of(id,4)` / `Ingredient.of('#tag',4)` | pressure_chamber.inputs / explosion_crafting.input / assembly_drill.input / assembly_laser.input | `SizedIngredient.FLAT_CODEC`：**必须替掉 KubeJS 内置件** —— 内置 `SizedIngredientWrapper` 在位置参数路径把 `{count:N}` **静默压成 1**（`IngredientKJS.kjs$asStack()` 里数量写成字面量 1），自 2101.2.0 起改由本组件读 count（用户实机报障后定位） |
 | `pneumaticcraft:fluid_ingredient` | `SizedFluidIngredient` | `{fluid\|tag, amount?}`（amount 缺省 1000，>0） | refinery.input / fluid_mixer.input1,2 / thermo_plant.inputs.fluid | `SizedFluidIngredient.FLAT_CODEC` → `FluidIngredient.MAP_CODEC_NONEMPTY`（`fluid` / `tag` 二选一） |
 | `pneumaticcraft:fluid_ingredient_unsized` | `FluidIngredient` | `{fluid\|tag}`，**不接受 amount** | fuel_quality.fluid | `FluidIngredient.CODEC_NON_EMPTY`（NeoForge 会静默忽略多余的 `amount`，所以这里显式拒绝） |
 | `pneumaticcraft:fluid_container_ingredient` | `FluidContainerValue` | `{id\|tag, amount}`（amount **必填**） | heat_frame_cooling.input.fluid | `either(FluidStack.CODEC, TagWithAmount)` —— **不认 `fluid:`**，这就是 Tier A 踩过的"either 树"坑 |
@@ -78,6 +79,7 @@ Valid keys: [id, tag, amount]
 |---|---|---|
 | **对象形态** `type({...})` | KubeJS 把它当作"配方 JSON"直接交给各键的 **codec**（= PnC 自己的 codec） | 与 PnC 同等：未知键被忽略，`id:` 之类别名不生效 |
 | **位置参数** `type(a, b, c)` / **键函数** `.temperature({...})` / 函数糖 | 走组件的 **`wrap()`** | 严格：拒绝未知键并列出合法键、支持 `id` 别名、校验 PnC 的数值规则 |
+| 物品数量 `{count:N}` | 生效 | 生效（2101.2.0 起走 `pneumaticcraft:item_ingredient`；此前被 KubeJS 内置组件**静默压成 1**，且两个路径结果不一致） |
 
 对象形态还保留了一个额外能力：**schema 没声明的键会原样透传**（例如 amadron 的 `whitelist`/`blacklist`）。
 
@@ -90,15 +92,15 @@ kubejs-pnc\
   build.ps1                    一键：javac 编译 → 组装 → 可复现打包 → jar 内静态校验（-Install 装机）
   tools\
     smoke.ps1                  离线 codec 冒烟测试（不开游戏）
-    smoke\CodecSmokeTest.java  46 条判据：形状、往返、该拒的拒
+    smoke\CodecSmokeTest.java  53 条判据：形状、往返、该拒的拒
     ensure-bom.ps1             给所有 .ps1 补 UTF-8 BOM（PS 5.1 没 BOM 会把中文注释按 ANSI 解）
   libs\                        编译用（不进产物）：neoforge-21.1.249-merged.jar + kubejs + rhino + DFU + gson + fastutil
   libs-run\                    冒烟测试运行时依赖（brigadier / guava / log4j …）
   src\main\java\dev\taao\kubejspnc\
     KubeJSPneumaticCraftPlugin.java   插件入口（只做两件事：注册组件、注册函数类型）
-    PncComponents.java                组件类型注册表（10 个 id 都在这里）
+    PncComponents.java                组件类型注册表（11 个 id 都在这里）
     PncUtil.java                      JS 值读取 / id 解析 / 报错文案
-    component\                        10 个组件实现 + FieldSettable 接口
+    component\                        11 个组件实现 + FieldSettable 接口
     value\                            5 个值类型（含各自的 codec）
     function\SetFieldFunction.java    pnc_set_field 函数类型
   src\main\resources\
@@ -113,18 +115,20 @@ kubejs-pnc\
 ### 构建
 
 ```powershell
-pwsh -File build.ps1                                        # 编译 + 打包 + 四层静态校验
+pwsh -File build.ps1                                        # 编译 + 打包 + 五层静态校验
 pwsh -File build.ps1 -Install -Instance <整合包目录>          # 再复制进 mods\（需游戏已关闭）
 pwsh -File tools\smoke.ps1                                  # 离线 codec 冒烟测试（不用开游戏）
 ```
 
 - 产物 `dist\kubejs_pneumaticcraft-<version>.jar`：条目按路径排序、固定时间戳（2026-01-01）、
-  正斜杠路径 ⇒ **同样的源码永远得到同样的 sha256**（现役 `55,475 B / 36 条目`，sha256 `eadb490a…9c84`）。
+  正斜杠路径 ⇒ **同样的源码永远得到同样的 sha256**（现役 `60,375 B / 37 条目`，sha256 `d398b5ea…f94a`）。
 - 图标：`src\main\resources\kubejs_pneumaticcraft_logo.png`，由 `mods.toml` 的 `logoFile=` 引用；
   构建脚本会校验"声明了就必须在 jar 里、且是合法 PNG"。
-- **校验分四层**：① jar 内 schema JSON 全部可解析；② schema 引用的每个组件 id 都在已注册清单里
-  （本件 10 个 + KubeJS 内置白名单）；③ 插件主类 / `kubejs.plugins.txt` / `mods.toml` / 图标就位；
-  ④ **每个 schema 的键名必须等于 PnC 的真实字段名、且 PnC 的必填字段必须声明**。
+- **校验分五层**：① jar 内 schema JSON 全部可解析；② schema 引用的每个组件 id 都在已注册清单里
+  （本件 11 个 + KubeJS 内置白名单），且**不得使用 KubeJS 内置的 sized-ingredient 组件**（它会静默吞掉 `count`）；
+  ③ 插件主类 / `kubejs.plugins.txt` / `mods.toml` / 图标就位；
+  ④ **每个 schema 的键名必须等于 PnC 的真实字段名、且 PnC 的必填字段必须声明**；
+  ⑤ **产物的 class 版本必须是 major 65（Java 21）**（编译环境漂移会让 jar 在 1.21.1 上直接崩）。
 - 需要 **JDK 21+**（脚本按 `$env:PNC_JAVAC` → `JAVA_HOME` → 常见安装位置 → `PATH` 的顺序找）。
 - `-Instance` 也可用环境变量 `TAAO_INSTANCE` 提供；只需编译时**不必**给。
 
