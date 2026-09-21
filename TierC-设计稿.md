@@ -351,5 +351,14 @@ taao-dev\kubejs-pnc\
 **待实机**：探针 `kubejs\dev-probes\pnc-sized-probe.js`（7 条 `taao:tc/sized/*`，A/B/C/D 四组写法），
 判据 = JEI 里每条都显示 **4** 个 / `/kubejs export` 导出 JSON 里 `inputs[0].count == 4`。
 
-**产物**：`dist\kubejs_pneumaticcraft-2101.2.0.jar`，60,375 B / 37 条目（schema 11 + class 21 + 元数据 4 + 图标 1），
-sha256 `d398b5ea947d00ae9e45293c686b01392ea923d7dccf6939e8b7eaf6daf8f94a`。
+**产物与实机验收（2026-09-20，玩家操作）**：`kubejs_pneumaticcraft-2101.2.0.jar`，**60,377 B** / 37 条目
+（schema 11 + class 21 + 元数据 4 + 图标 1），sha256 `c319218f…81e7` —— 已发
+[Release **`v2101.2.0`**（Latest）](https://github.com/IronHammer-Std/KubeJS-PneumaticCraft/releases/tag/v2101.2.0)，
+GitHub 附件 digest 与本地**逐字节一致**。
+**实机判据**：探针 7 条 `taao:tc/sized/*`（A Map 形态 / B 字符串简写 / C Java 对象 / D 对象形态）在 JEI 里
+**每条都吃 4 个**（修前位置参数那几条只吃 1 个）；KubeJS 汇总 `with 0 failed recipes`。
+**装机自查**：jar 内 16 个非 class 条目与仓库 `src/main/resources` **逐字节一致**、class major 65（Java 21）。
+⚠️ **可复现性的前提是同一个 JDK**：同一源码在纯 JDK 21 下构建得到 **60,375 B / `d398b5ea…f94a`**
+（条目、class major 65、行为都相同，只有字节码细节不同）。据字节数差（2 B）+ 条目/语义一致**推断**：
+这次装机的 60,377 B 那份是 `build.ps1` 在未指定 `PNC_JAVAC`/`JAVA_HOME` 时落到 PATH 的 **JDK 24 + `--release 21`** 产物。
+这条已写进 README（"可复现"须注明 JDK）。

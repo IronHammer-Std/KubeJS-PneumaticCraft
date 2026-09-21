@@ -121,7 +121,11 @@ pwsh -File tools\smoke.ps1                                  # 离线 codec 冒�
 ```
 
 - 产物 `dist\kubejs_pneumaticcraft-<version>.jar`：条目按路径排序、固定时间戳（2026-01-01）、
-  正斜杠路径 ⇒ **同样的源码永远得到同样的 sha256**（现役 `60,375 B / 37 条目`，sha256 `d398b5ea…f94a`）。
+  正斜杠路径 ⇒ **同一 JDK + 同一源码 = 同一个 sha256**（现役 `60,377 B / 37 条目`，sha256 `c319218f…81e7`
+  = Release [`v2101.2.0`](https://github.com/IronHammer-Std/KubeJS-PneumaticCraft/releases/tag/v2101.2.0) 的附件，
+  也是实机验证过的那一份）。
+  ⚠️ **JDK 会改变字节码细节**：本机 JDK 24 加 `--release 21` 得到 60,377 B；纯 JDK 21 得到 60,375 B（`d398b5ea…`）——
+  两者 class major 都是 65、行为相同，但 sha256 不同 ⇒ "可复现"的前提是**用同一个 JDK**（推荐 JDK 21）。
 - 图标：`src\main\resources\kubejs_pneumaticcraft_logo.png`，由 `mods.toml` 的 `logoFile=` 引用；
   构建脚本会校验"声明了就必须在 jar 里、且是合法 PNG"。
 - **校验分五层**：① jar 内 schema JSON 全部可解析；② schema 引用的每个组件 id 都在已注册清单里
