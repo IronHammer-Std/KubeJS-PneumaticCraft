@@ -177,7 +177,8 @@ taao-dev\kubejs-pnc\
 2. **`thermo_plant` 从"只能管产出"变成"完整可写"**（24 条配方的最大一块）；
 3. `temperature` 等对象字段**可空、有校验**，摆脱 `map` 的坑；
 4. 剩余 2 类（`fuel_quality` / `heat_properties`）可补齐；
-5. 成为**全网第一个** KubeJS × PneumaticCraft 联动件（Tier A 已可作为它的数据底座）。
+5. 补上 KubeJS 侧的空缺 —— ⚠️ 原文写的是"成为**全网第一个** KubeJS × PneumaticCraft 联动件"，
+   **该说法已于 2026-09-20 撤回**（GitHub 上 2024 年就有一个同名仓库，见 §9.9）。
 
 ---
 
@@ -362,3 +363,40 @@ GitHub 附件 digest 与本地**逐字节一致**。
 （条目、class major 65、行为都相同，只有字节码细节不同）。据字节数差（2 B）+ 条目/语义一致**推断**：
 这次装机的 60,377 B 那份是 `build.ps1` 在未指定 `PNC_JAVAC`/`JAVA_HOME` 时落到 PATH 的 **JDK 24 + `--release 21`** 产物。
 这条已写进 README（"可复现"须注明 JDK）。
+
+---
+
+### 9.9 同名项目核查：GitHub 上确有同名仓库（2026-09-20，玩家发现）
+
+玩家发现 <https://github.com/FooterManDev/KubeJS-Pneumaticcraft> —— 仓库名与本件**一字不差**。核实方式：
+**只读元数据、目录结构与常量字符串，不看实现代码**（该仓库 **无许可证**，GitHub `licenseInfo: null` = 保留所有权利；
+本件实现自始至终只依据 PnC / KubeJS 自己的源码）。
+
+| 项 | 对方 | 本件 |
+|---|---|---|
+| 仓库 | `FooterManDev/KubeJS-Pneumaticcraft` | `IronHammer-Std/KubeJS-PneumaticCraft` |
+| **modId** | **`kjspncr`** | `kubejs_pneumaticcraft` |
+| 显示名 | `KubeJS PneumaticCraft`（**与本件相同**） | `KubeJS PneumaticCraft` |
+| 目标 | **MC 1.20.1 / Forge 47.2.1 / KubeJS 2001.6.4（KubeJS 6）** | MC 1.21.1 / NeoForge 21.1 / KubeJS 2101.7.2（KubeJS 7） |
+| 形态 | KubeJS 插件：21 个 java（10 个 schema：amadron / assembly_drill / assembly_laser / **assembly_drill_laser** / explosion_crafting / fluid_mixer / fuel_quality / heat_frame_cooling / pressure_chamber / refinery / thermo_plant）+ 1 个 mixin | KubeJS 插件：18 个 java + 11 个 schema + **11 个组件** + 0 mixin |
+| 发布状态 | **无 Release、无 tag**、0 star / 1 fork、description 空、**无许可证**；README 自述是 "a quick mod template for KubeJS Addon Mods" | Release `v2101.2.0`、MIT、描述与 topics 齐 |
+| 活跃度 | 最后提交 **2024-04-30**（已停更） | 2026-09-20 |
+| 构建 | Architectury Loom / yarn 映射 | 纯 `javac` + PowerShell 可复现打包 |
+
+**结论**：
+
+1. **技术上零冲突** —— modId 不同、MC / 加载器 / KubeJS **大版本**都不同（KubeJS 6 与 7 的 addon API 不兼容），
+   不可能同装，也不会互相覆盖 jar。
+2. **但"全网第一个"不成立** ⇒ 该说法已从 §7 撤回。09-19 那次核查覆盖的是
+   **Modrinth / CurseForge / KubeJS 官方第三方名录 / PnC 本体 jar**，**漏了 GitHub 仓库名搜索** —— 盲区记在这里防重犯。
+   （当时其余结论**仍然成立**：今天复查 Modrinth 搜索 `kubejs pneumaticcraft` 依旧 **0 命中**，对方也没有 CF / Modrinth 页面。）
+3. 对方实现里有个 `AssemblyDrillLaserRecipeSchema`（我们按设计不暴露的那一类）。**我们没有据此改判断**，而是回头复核 PnC 源码：
+   `AssemblyRecipeImpl.Serializer.checkNotDrillAndLaser()`（`AssemblyRecipeImpl.java:127-132`）明确
+   `DataResult.error("'drill_laser' may not be used as a recipe type!")`，且同文件 `calculateAssemblyChain()`（73-94）
+   证明该类型配方是**运行时由 drill × laser 配方交叉计算生成**的 ⇒ **本件"不暴露 `assembly_drill_laser`"的决定依然正确**
+   （数据包里写它也会被 PnC 当场拒绝）。
+4. **命名层面**：显示名相同，但 CF slug `kubejs-pneumaticcraft` 已由本件占用、Modrinth 无同名项目 ⇒
+   **不改名**，只在 README 加一句"与本项目无关"的澄清（防玩家混淆）。另记一条**未来风险**：
+   若哪天出现同样面向 1.21.1 的第三方 addon 且也用 `pneumaticcraft:` 命名空间注册 KubeJS 组件，
+   两边组件 id 会撞（KubeJS 组件表是全局的）—— 本件用 `pneumaticcraft:` 是照 `kubejs-create` / `kubejs-mekanism` 的生态惯例，
+   暂不为此改名，先把风险登记在此。

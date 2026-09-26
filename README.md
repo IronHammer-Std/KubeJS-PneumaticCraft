@@ -11,6 +11,11 @@ KubeJS × [PneumaticCraft: Repressurized](https://github.com/TeamPneumatic/pnc-r
 - 适用：Minecraft 1.21.1 · NeoForge 21.1.181+ · KubeJS 2101.7.2-build.303+ · PneumaticCraft 8.2+ · Java 21
 - 发布页文案见 [`DESCRIPTION.md`](DESCRIPTION.md)
 
+> **同名项目澄清**：GitHub 上另有一个同名仓库
+> [FooterManDev/KubeJS-Pneumaticcraft](https://github.com/FooterManDev/KubeJS-Pneumaticcraft)
+> （2024 年，MC **1.20.1 / Forge**，modId `kjspncr`，无 Release、无许可证、已停更）—— 与本项目**无任何关系**：
+> 目标版本与 KubeJS 大版本都不同，两者不可能同装。本项目的 modId 是 `kubejs_pneumaticcraft`。
+
 ---
 
 ## 1. 它解决什么
